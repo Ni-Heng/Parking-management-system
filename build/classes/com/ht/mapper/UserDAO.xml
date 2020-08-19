@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- mybatis dtd file -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace attribute: used to specify which interface to point to -->
+<mapper namespace="com.ht.mapper.UserDAO">
+	<!-- User registration -->
+	<insert id="reg" parameterType="userVo">
+		<![CDATA[
+			insert into users(userId,password,userName,mobile,status) values(#{userId},#{password},#{userName},#{mobile},#{status})
+		]]>
+	</insert>
+	<!-- User login-->
+	<select id="login" parameterType="userVo" resultType="userVo">
+		<![CDATA[
+			select * from users where userId=#{userId} and password=#{password}
+		]]>
+	</select>
+	<!-- user list -->
+	<select id="userList" resultType="userVo">
+		select * from users;
+	</select>
+	<!-- Operate by userId -->
+	<select id="findById" parameterType="userVo" resultType="userVo">
+		<![CDATA[
+			select * from users where userId=#{userId}
+		]]>
+	</select>
+	<!-- change Password -->
+	<update id="pwd" parameterType="userVo">
+		<![CDATA[
+			update users set password=#{password} where userId=#{userId}
+		]]>
+	</update>
+	<!-- Modify status -->
+	<update id="updStatus" parameterType="userVo">
+		update users set status=#{status} where userId=#{userId}
+	</update>
+</mapper>

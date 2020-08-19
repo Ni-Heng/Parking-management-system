@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--mybatis dtd file -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace attribute: used to specify which interface to point to -->
+<mapper namespace="com.ht.mapper.FinanceDAO">
+	<!-- New charge -->
+	<insert id="financeAdd" parameterType="FinanceVo">
+		<![CDATA[
+			insert into finance(carNo,financeType,totalMoney,userName,oprTime,remark) values(#{carNo},#{financeType},#{totalMoney},#{userName},#{oprTime},#{remark})
+		]]>
+	</insert>
+	<!-- Find all payment records-->
+	<select id="findAll" parameterType="String" resultType="FinanceVo">
+		<![CDATA[
+			select * from finance 
+		]]>
+		<if test="carNo !=null and carNo!=''">
+			where carNo=#{carNo}
+		</if>
+		order by financeId desc
+	</select>
+</mapper>

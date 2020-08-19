@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- mybatis dtd file -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace attribute: used to specify which interface to point to -->
+<mapper namespace="com.ht.mapper.CarInfoDAO">
+	<!-- Registered owner information -->
+	<insert id="carAdd" parameterType="carInfoVo">
+		<![CDATA[
+			insert into carinfo(carNo,userName,mobile,startDate,expireDate,remark) values(#{carNo},#{userName},#{mobile},#{startDate},#{expireDate},#{remark})
+		]]>
+	</insert>
+	<!-- Find all owners-->
+	<select id="findAll" parameterType="String" resultType="carInfoVo">
+		<![CDATA[
+			select * from carinfo 
+		]]>
+		<if test="carNo !=null and carNo!=''">
+			where carNo=#{carNo}
+		</if>
+		order by carInfoId desc
+	</select>
+	<!-- Find a car by license plate -->
+	<select id="findCarbyCarId" parameterType="String" resultType="carInfoVo">
+		select carNo,userName,mobile,startDate,expireDate,DATEDIFF(expireDate,now()) AS DiffDate,remark from carinfo where carNo = #{carNo}
+	</select>
+	<select id="get" parameterType="int" resultType="carInfoVo">
+		select * from carinfo where carInfoId=#{carInfoId}
+	</select>
+	<delete id="del" parameterType="int">
+		delete from carinfo where carInfoId=#{carInfoId}
+	</delete>
+	<!-- Modify vehicle information -->
+	<update id="updateCarInfo" parameterType="carInfoVo">
+		<![CDATA[
+			update carinfo set carNo=#{carNo},userName=#{userName},mobile=#{mobile},startDate=#{startDate},expireDate=#{expireDate},remark=#{remark} where carInfoId=#{carInfoId}
+		]]>
+	</update>
+</mapper>

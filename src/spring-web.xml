@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+<!--Configure spring mvc-->
+    <!--1, turn on springmvc annotation mode
+    a. Automatically register DefaultAnnotationHandlerMapping, AnnotationMethodHandlerAdapter
+    b. Provides a series of functions by default: data binding, number and date format@NumberFormat,@DateTimeFormat
+    c: xml, json default read and write support -->
+    <mvc:annotation-driven conversion-service="dateUtil">
+    </mvc:annotation-driven>
+
+    <!--2. Static resource default servlet configuration -->
+    <!--
+        1).Add processing of static resources: requests that exclude static resources such as suffixes js, gif, png, etc. will not enter the controller
+        2).Allow the use of "/" for overall mapping
+    -->
+      <mvc:default-servlet-handler />
+    
+
+    <!--3: Configure JSP to display ViewResolver-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <!-- Configure the root path of the WEB page -->
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <!-- Configure system support page type -->
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!--4: Scan all controllers on the web-->
+    <context:component-scan base-package="com.ht.controller"/>
+
+    <!-- FastJson injection -->
+    <mvc:annotation-driven>
+        <mvc:message-converters register-defaults="true">
+            <!-- Avoid downloading files when returning JSON when IE executes AJAX -->
+            <!-- FastJson -->
+            <bean id="fastJsonHttpMessageConverter"
+                  class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <!-- The order here cannot be reversed, you must write text/html first, otherwise a download prompt will appear under ie -->
+                        <value>text/html;charset=UTF-8</value>
+                        <value>application/json;charset=UTF-8</value>
+                    </list>
+                </property>
+                <property name="features">
+                    <array value-type="com.alibaba.fastjson.serializer.SerializerFeature">
+                        <!-- Avoid circular references -->
+                        <value>DisableCircularReferenceDetect</value>
+                        <!-- Whether to output a field with a value of null -->
+                        <value>WriteMapNullValue</value>
+                        <!-- If the numeric field is null, the output is 0 instead of null -->
+                        <value>WriteNullNumberAsZero</value>
+                        <!-- If the character type field is null, the output is "" instead of null -->
+                        <value>WriteNullStringAsEmpty</value>
+                        <!-- If the List field is null, the output is [] instead of null -->
+                        <value>WriteNullListAsEmpty</value>
+                        <!-- If the Boolean field is null, the output is false, not null -->
+                        <value>WriteNullBooleanAsFalse</value>
+                    </array>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <!-- Interceptor configuration -->
+    <mvc:interceptors>
+       <!-- Internationalization interceptor, get the suffix name of the resource file-->
+        <bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+            <property name="paramName" value="lang"/>
+        </bean>
+    </mvc:interceptors>
+	<!-- Provide automatic conversion function for the date type of the entire system -->
+    <bean id="dateUtil" class="org.springframework.format.support.FormattingConversionServiceFactoryBean" >
+        <property name="converters" >
+            <list>
+                <bean class="com.base.DateUtil"></bean>
+            </list>
+        </property>
+    </bean>
+
+
+   <!-- File upload -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+       <!-- The maximum size of configuration file upload (bytes) here is 1M -->
+        <property name="maxUploadSize" value="10485760"/>
+    </bean>
+
+
+    <!-- The path and prefix name of the internationalized resource file
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource"> 
+    --> 
+    <!-- The path and prefix name of the internationalized resource file -->
+    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+    
+       <!-- Indicates that the multi-language configuration file is in the root path, and the file starting with i18n -->
+        <property name="basename" value="classpath:i18n"/>
+        <property name="useCodeAsDefaultMessage" value="true"/>
+    </bean>
+	<!-- Get local
+   <bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver"/>  
+   -->
+    <!-- Configure SessionLocaleResolver to store Locale objects in Session for subsequent use -->
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver"></bean>
+    
+</beans>

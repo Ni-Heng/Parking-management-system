@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--Configure and integrate mybatis process
+    1.Configure database related parameters -->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+
+  <!-- Configure data source -->
+    <bean name="druidDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="driverClassName" value="${jdbc_driverClassName}" />
+        <property name="url" value="${jdbc_url}"/>
+        <property name="username" value="${jdbc_username}"/>
+        <property name="password" value="${jdbc_password}"/>
+
+        <!-- Initial connection size -->
+        <property name="initialSize" value="5"/>
+        <!-- The maximum number of connections used in the connection pool -->
+        <property name="maxActive" value="50"/>
+        <!-- Maximum free connection pool -->
+        <property name="maxIdle" value="20"/>
+        <!-- Minimum idle connection pool -->
+        <property name="minIdle" value="5"/>
+        <!-- Maximum waiting time for connection -->
+        <property name="maxWait" value="60000"/>
+
+        <property name="validationQuery" value="${validationQuery}"/>
+        <property name="testOnBorrow" value="false"/>
+        <property name="testOnReturn" value="false"/>
+        <property name="testWhileIdle" value="true"/>
+
+        <!--Configure how long the interval is to perform a check, check idle connections that need to be closed, in millisecond -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+        <!-- Configure the minimum survival time of a connection in the pool, in milliseconds -->
+        <property name="minEvictableIdleTimeMillis" value="25200000"/>
+
+        <!-- Turn on the removeAbandoned function -->
+        <property name="removeAbandoned" value="true"/>
+        <!-- 1800 seconds, which is 30 minutes -->
+        <property name="removeAbandonedTimeout" value="1800"/>
+        <!-- Output error log when closing abandoned connection -->
+        <property name="logAbandoned" value="true"/>
+
+        <!-- Monitoring database -->
+        <property name="filters" value="mergeStat"/>
+    </bean>
+
+
+    <bean id="dbcpDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${jdbc_driverClassName}" />
+        <property name="url" value="${jdbc_url}" />
+        <property name="username" value="${jdbc_username}" />
+        <property name="password" value="${jdbc_password}" />
+        <!-- Initial connection size (default value is 0) -->
+        <property name="initialSize" value="1"/>
+        <!-- Maximum number of connection pools (default value is 8)-->
+        <property name="maxActive" value="10"/>
+       <!-- Maximum idle connection pool (default is 8) -->
+        <property name="maxIdle" value="5"/>
+       <!-- Minimum idle connection pool (default is 0)-->
+        <property name="minIdle" value="0"/>
+       <!-- The maximum waiting time for obtaining a connection 5 seconds -->
+        <property name="maxWait" value="5000"/>
+    </bean>
+
+
+
+    <!--Convention is greater than configuration-->
+    <!--3. Configure the SqlSessionFactory object -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--Next is the real integration configuration of mybatis and spring-->
+      <!--Inject the database connection pool-->
+        <property name="dataSource" ref="druidDataSource"/>
+       <!--Configure mybatis global configuration file: mybatis-config.xml-->
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <!--Scan the entity package, use aliases, multiple uses; separate-->
+        <property name="typeAliasesPackage" value="com.ht.vo"/>
+        <!--Scan sql configuration file: xml file required by mapper-->
+        <property name="mapperLocations" value="classpath:com/ht/mapper/*.xml"/>
+    </bean>
+
+    <!-- 4: Configure the scan Dao interface package, dynamically implement the DAO interface, and inject it into the spring container -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+       <!--Inject SqlSessionFactory-->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <!-- Give the Dao interface that needs to be scanned -->
+        <property name="basePackage" value="com.ht.mapper"/>
+    </bean>
+
+</beans>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- mybatis dtd file -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace attribute: used to specify which interface to point to -->
+<mapper namespace="com.ht.mapper.SysSetDAO">
+	<!-- View details-->
+	<select id="getSet" resultType="sysSetVo">
+		<![CDATA[
+			select * from sysset
+		]]>
+	</select>
+	<!-- Modify settings -->
+	<update id="updateSet" parameterType="sysSetVo">
+		<![CDATA[
+			update sysset set mianfeiTime=#{mianfeiTime},shoufeiTime=#{shoufeiTime},shoufeiMoney=#{shoufeiMoney}
+		]]>
+	</update>
+</mapper>

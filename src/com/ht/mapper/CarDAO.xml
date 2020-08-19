@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- mybatis dtd file -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace attribute: used to specify which interface to point to -->
+<mapper namespace="com.ht.mapper.CarDAO">
+	<!-- Car enters -->
+	<insert id="carIn" parameterType="carVo">
+		<![CDATA[
+			insert into car(cardNo,inTime,inPic,carFee,status,userName) values(#{cardNo},#{inTime},#{inPic},#{carFee},#{status},#{userName})
+		]]>
+	</insert>
+	<!-- Car departure -->
+	<update id="carOut">
+		<![CDATA[
+			update car set outTime=#{outTime},outPic=#{outPic},carFee=#{carFee},financeType=#{financeType},status=#{status},userName=#{userName},remark=#{remark} where carId=#{carId}
+		]]>
+	</update>
+	<!-- List-->
+	<select id="findAll" parameterType="carVo" resultType="carVo">
+		<![CDATA[
+			select * from car
+		]]>
+		<if test="carVo!=null">
+			<if test="cardNo!=null and cardNo!=''">
+				where cardNo=#{cardNo}
+			</if>
+			<if test="status>=0">
+				status = #{status}
+			</if>
+		</if>
+		order by inTime desc
+	</select>
+	<select id="count" parameterType="carVo" resultType="int">
+		<![CDATA[
+			select count(*)  from car 
+		]]>
+		<where>
+		<if test="car!=null">
+			<if test="car.cardNo!=null and car.cardNo!=''">
+				cardNo=#{car.cardNo}
+			</if>
+			<if test="car.inTime!=null and car.inTime !='' and car.outTime!=null and car.outTime!=''">
+					and inTime between '${car.inTime} 00:00:00' and '${car.outTime} 23:59:59'
+			</if>
+			</if>
+		</where>
+		
+	</select>
+	
+	<select id="findByCarNo" parameterType="carVo" resultType="carVo">
+		<![CDATA[
+			select * from car 
+		]]>
+		<where>
+		<if test="car!=null">
+			<if test="car.cardNo!=null and car.cardNo!=''">
+				cardNo=#{car.cardNo}
+			</if>
+			<if test="car.inTime!=null and car.inTime !='' and car.outTime!=null and car.outTime!=''">
+					and inTime between '${car.inTime} 00:00:00' and '${car.outTime} 23:59:59'
+			</if>
+		</if>	
+		</where>
+		order by inTime desc limit #{pager.startRow},#{pager.pageRow}
+	</select>
+	
+	<!-- Find by status -->
+	<select id="findByStatus" parameterType="carVo" resultType="carVo">
+		select carId,cardNo,inTime,outTime,inPic,outPic,carFee,financeType,status,userName,remark,(timestampdiff(minute,inTime,now())) minutes from car where cardNo=#{cardNo} and status=#{status}
+		
+	</select>
+</mapper>

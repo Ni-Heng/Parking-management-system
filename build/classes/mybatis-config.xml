@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!--Configure global properties-->
+    <settings>
+        <!--Use jdbc's getGeneratekeys to obtain auto-incrementing primary key values-->
+        <setting name="useGeneratedKeys" value="true"/>
+        <!--Use column alias to replace column name 　　 The default value is true
+        select name as title (the attribute name in the entity is title) form table;
+        After opening, mybatis will automatically help us assign the value of name in the table to the title attribute of the corresponding entity
+        -->
+        <setting name="useColumnLabel" value="true"/>
+        <!--Open camel case name conversion Table: create_time to Entity(createTime)-->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+</configuration>
